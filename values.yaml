@@ -30,3 +30,13 @@ yaml:
       memory: "150Mi"
 #  nodeSelector: {}
 #  tolerations: []
+#
+api:
+  dashboard: true
+  insecure: true
+#
+# providers:
+#   file:
+#     filename: dynamic_conf.yml
+#     directory: /path/to/config
+#     watch: true

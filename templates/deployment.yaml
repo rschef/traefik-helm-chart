@@ -76,8 +76,14 @@ spec:
           - "--entryPoints.web.address=:{{ .Values.ports.web.port }}"
           - "--entryPoints.websecure.address=:{{ .Values.ports.websecure.port }}"
           - "--entryPoints.traefik.address=:{{ .Values.ports.traefik.port }}"
-          - "--api.dashboard=true"
-          - "--api.insecure=true"
           - "--ping=true"
           - "--providers.kubernetescrd"
           - "--log.level={{ .Values.logs.loglevel }}"
+        {{- range $key, $val := .Values.api }}
+          - "--api.{{ $key }}={{ $val }}"
+        {{- end }}
+        {{- range $provider, $providerMap := .Values.providers }}
+        {{- range $key, $val := $providerMap }}
+          - "--providers.{{ $provider }}.{{ $key }}={{ $val }}"
+        {{- end }}
+        {{- end }}
