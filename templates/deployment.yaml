@@ -84,9 +84,8 @@ spec:
           - "--ping=true"
           - "--providers.kubernetescrd"
           - "--log.level={{ .Values.logs.loglevel }}"
-        {{- range $key, $val := .Values.api }}
-          - "--api.{{ $key }}={{ $val }}"
-        {{- end }}
+          - "--api.dashboard={{ .Values.api.dashboard.enabled }}"
+          - "--api.insecure={{ .Values.api.insecure }}"
         {{- range $provider, $providerMap := .Values.providers }}
         {{- range $key, $val := $providerMap }}
           - "--providers.{{ $provider }}.{{ $key }}={{ $val }}"

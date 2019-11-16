@@ -32,8 +32,11 @@ yaml:
 #  tolerations: []
 #
 api:
-  dashboard: true
   insecure: true
+  dashboard:
+    enabled: true
+#    certResolver: default
+#    host: host.dashboard.com
 #
 # providers:
 #   file:

@@ -12,9 +12,11 @@ metadata:
 spec:
   entryPoints:
     - web
+  tls:
+    certResolver: {{ .Values.api.dashboard.certResolver }}
   routes:
-  - match: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+  - match: Host(`{{ .Values.api.dashboard.host }}`)
     kind: Rule
     services:
-    - name:  {{ template "traefik.fullname" . }}-dashboard
+    - name: {{ template "traefik.fullname" . }}-dashboard
       port: 80
