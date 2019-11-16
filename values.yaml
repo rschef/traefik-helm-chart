@@ -32,11 +32,18 @@ yaml:
 #  tolerations: []
 #
 api:
-  dashboard: true
   insecure: true
+  dashboard:
+    enabled: true
+#    certResolver: default
+#    host: host.dashboard.com
 #
 # providers:
 #   file:
 #     filename: dynamic_conf.yml
 #     directory: /path/to/config
 #     watch: true
+#
+# volume:
+#  hostPath: /etc/kubernetes/traefik
+#  containerPath: /traefik

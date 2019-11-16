@@ -72,6 +72,11 @@ spec:
         - name: traefik
           containerPort: {{ .Values.ports.traefik.port }}
           protocol: TCP
+        {{- if .Values.volume }}
+        volumeMounts:
+        - mountPath: {{ .Values.volume.containerPath }}
+          name: traefik-config
+        {{- end }}
         args:
           - "--entryPoints.web.address=:{{ .Values.ports.web.port }}"
           - "--entryPoints.websecure.address=:{{ .Values.ports.websecure.port }}"
@@ -79,11 +84,17 @@ spec:
           - "--ping=true"
           - "--providers.kubernetescrd"
           - "--log.level={{ .Values.logs.loglevel }}"
-        {{- range $key, $val := .Values.api }}
-          - "--api.{{ $key }}={{ $val }}"
-        {{- end }}
+          - "--api.dashboard={{ .Values.api.dashboard.enabled }}"
+          - "--api.insecure={{ .Values.api.insecure }}"
         {{- range $provider, $providerMap := .Values.providers }}
         {{- range $key, $val := $providerMap }}
           - "--providers.{{ $provider }}.{{ $key }}={{ $val }}"
         {{- end }}
         {{- end }}
+      {{- if .Values.volume }}
+      volumes:
+      - hostPath:
+          path: {{ .Values.volume.hostPath }}
+          type: Directory
+        name: traefik-config
+      {{- end }}
