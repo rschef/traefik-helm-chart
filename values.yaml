@@ -40,3 +40,7 @@ api:
 #     filename: dynamic_conf.yml
 #     directory: /path/to/config
 #     watch: true
+#
+# volume:
+#  hostPath: /etc/kubernetes/traefik
+#  containerPath: /traefik
