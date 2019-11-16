@@ -72,11 +72,9 @@ spec:
         - name: traefik
           containerPort: {{ .Values.ports.traefik.port }}
           protocol: TCP
-        {{- if .Values.volume }}
         volumeMounts:
-        - mountPath: {{ .Values.volume.containerPath }}
-          name: traefik-config
-        {{- end }}
+        - name: traefik-config-vol
+          mountPath: /etc/config
         args:
           - "--entryPoints.web.address=:{{ .Values.ports.web.port }}"
           - "--entryPoints.websecure.address=:{{ .Values.ports.websecure.port }}"
@@ -86,15 +84,15 @@ spec:
           - "--log.level={{ .Values.logs.loglevel }}"
           - "--api.dashboard={{ .Values.api.dashboard.enabled }}"
           - "--api.insecure={{ .Values.api.insecure }}"
-        {{- range $provider, $providerMap := .Values.providers }}
-        {{- range $key, $val := $providerMap }}
-          - "--providers.{{ $provider }}.{{ $key }}={{ $val }}"
-        {{- end }}
-        {{- end }}
-      {{- if .Values.volume }}
+      {{- if .Values.file_provider_config_map }}
+          - "--providers.file.filename=config.yml"
+          - "--providers.file.directory=/etc/config"
+          - "--providers.file.watch=true"
       volumes:
-      - hostPath:
-          path: {{ .Values.volume.hostPath }}
-          type: Directory
-        name: traefik-config
+      - name: traefik-config-vol
+        configMap:
+          name: {{ .Values.file_provider_config_map }}
+          items:
+            - key: config.yml
+              path: config.yml
       {{- end }}

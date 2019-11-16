@@ -38,12 +38,5 @@ api:
 #    certResolver: default
 #    host: host.dashboard.com
 #
-# providers:
-#   file:
-#     filename: dynamic_conf.yml
-#     directory: /path/to/config
-#     watch: true
+# file_provider_config_map: traefik-config
 #
-# volume:
-#  hostPath: /etc/kubernetes/traefik
-#  containerPath: /traefik
