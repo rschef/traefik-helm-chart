@@ -11,12 +11,22 @@ metadata:
     heritage: {{ .Release.Service | quote }}
 spec:
   entryPoints:
-    - web
+  {{- range $entryPoint := .Values.api.dashboard.entryPoints }}
+    - {{ $entryPoint }}
+  {{- end }}
+  {{- if .Values.api.dashboard.certResolver }}
   tls:
     certResolver: {{ .Values.api.dashboard.certResolver }}
+  {{- end }}
   routes:
   - match: Host(`{{ .Values.api.dashboard.host }}`)
     kind: Rule
     services:
     - name: {{ template "traefik.fullname" . }}-dashboard
       port: 80
+  {{- if .Values.api.dashboard.middlewares }}
+  middlewares:
+  {{- range $middleware := .Values.api.dashboard.middlewares }}
+    - {{ $middleware }}
+  {{- end }}
+  {{- end }}
