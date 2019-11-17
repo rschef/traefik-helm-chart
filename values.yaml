@@ -35,6 +35,10 @@ api:
   insecure: true
   dashboard:
     enabled: true
+    entryPoints:
+      - web
+#    middlewares:
+#      - auth
 #    certResolver: default
 #    host: host.dashboard.com
 #
