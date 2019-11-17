@@ -75,7 +75,11 @@ spec:
         volumeMounts:
         - name: traefik-config-vol
           mountPath: /etc/config
-        {{- if or (and .Values.acme.enabled (eq .Values.acme.challengeType "dns-01") .Values.acme.dnsProvider.name) .Values.env }}
+        {{- if .Values.acme.enabled }}
+        - mountPath: /acme
+          name: acme
+        {{- end }}
+        {{- if or (and .Values.acme.enabled (eq .Values.acme.challengeType "dns") .Values.acme.dnsProvider.name) .Values.env }}
         env:
         {{- range $k, $v := (index .Values.acme.dnsProvider .Values.acme.dnsProvider.name) }}
           {{- if or $v $.Values.acme.dnsProvider.existingSecretName }}
@@ -100,11 +104,37 @@ spec:
           - "--log.level={{ .Values.logs.loglevel }}"
           - "--api.dashboard={{ .Values.api.dashboard.enabled }}"
           - "--api.insecure={{ .Values.api.insecure }}"
+        {{- if .Values.acme.enabled }}
+          - "--certificatesresolvers.default.acme.email={{ .Values.acme.email }}"
+          - "--certificatesresolvers.default.acme.storage=/acme/acme.json"
+        {{- end }}
+        {{- if and .Values.acme.enabled (eq .Values.acme.challengeType "dns") }}
+          - "--certificatesresolvers.default.acme.dnschallenge=true"
+          - "--certificatesresolvers.default.acme.dnschallenge.provider={{ .Values.acme.dnsProvider.name }}"
+        {{- end }}
+        {{- if and .Values.acme.enabled (eq .Values.acme.challengeType "tls") }}
+          - "--certificatesresolvers.default.acme.tlschallenge=true"
+        {{- end }}
+        {{- if and .Values.acme.enabled (eq .Values.acme.challengeType "http") }}
+          - "--certificatesresolvers.default.acme.httpchallenge=true"
+          - "--certificatesresolvers.default.acme.httpchallenge.entrypoint={{ .Values.acme.httpChallenge.entrypoint }}"
+        {{- end }}
       {{- if .Values.file_provider_config_map }}
           - "--providers.file.filename=config.yml"
           - "--providers.file.directory=/etc/config"
           - "--providers.file.watch=true"
+      {{- end }}
       volumes:
+      {{- if .Values.acme.enabled }}
+      - name: acme
+      {{- if .Values.acme.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.acme.persistence.existingClaim | default (printf "%s-acme" (include "traefik.fullname" .)) }}
+      {{- else }}
+        emptyDir: {}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.file_provider_config_map }}
       - name: traefik-config-vol
         configMap:
           name: {{ .Values.file_provider_config_map }}
