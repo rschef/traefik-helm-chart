@@ -47,6 +47,7 @@ api:
 acme:
   enabled: false
   email: admin@example.com
+  staging: true
   challengeType: tls
   persistence:
     enabled: true
