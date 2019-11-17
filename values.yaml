@@ -40,3 +40,13 @@ api:
 #
 # file_provider_config_map: traefik-config
 #
+acme:
+  enabled: false
+#  challengeType: "dns-01"
+#  dnsProvider:
+#    existingSecretName:
+#    name: route53
+#    route53:
+#      AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
+#      AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
+#      AWS_REGION: AWS_REGION

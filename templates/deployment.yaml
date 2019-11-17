@@ -75,6 +75,22 @@ spec:
         volumeMounts:
         - name: traefik-config-vol
           mountPath: /etc/config
+        {{- if or (and .Values.acme.enabled (eq .Values.acme.challengeType "dns-01") .Values.acme.dnsProvider.name) .Values.env }}
+        env:
+        {{- range $k, $v := (index .Values.acme.dnsProvider .Values.acme.dnsProvider.name) }}
+          {{- if or $v $.Values.acme.dnsProvider.existingSecretName }}
+          - name: {{ $k }}
+            valueFrom:
+              secretKeyRef:
+              {{- if $.Values.acme.dnsProvider.existingSecretName }}
+                name: {{ $.Values.acme.dnsProvider.existingSecretName }}
+              {{- else }}
+                name: {{ template "traefik.fullname" $ }}-dnsprovider-config
+              {{- end }}
+                key: {{ $k }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
         args:
           - "--entryPoints.web.address=:{{ .Values.ports.web.port }}"
           - "--entryPoints.websecure.address=:{{ .Values.ports.websecure.port }}"
