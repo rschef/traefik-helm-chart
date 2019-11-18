@@ -1,4 +1,4 @@
-{{- if .Values.api.dashboard.enabled }}
+{{- if and .Values.api.dashboard.enabled .Values.api.insecure }}
 apiVersion: v1
 kind: Service
 metadata:
