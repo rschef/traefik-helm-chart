@@ -1,3 +1,4 @@
+{{- if .Values.api.dashboard.enabled }}
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
@@ -30,3 +31,4 @@ spec:
     - {{ $middleware }}
   {{- end }}
   {{- end }}
+{{- end }}
