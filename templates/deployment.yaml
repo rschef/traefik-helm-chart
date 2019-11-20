@@ -73,11 +73,15 @@ spec:
           containerPort: {{ .Values.ports.traefik.port }}
           protocol: TCP
         volumeMounts:
+        {{- if .Values.accessLogVolume.enabled }}
+        - name: access-log-vol
+          mountPath: {{ .Values.accessLogVolume.mountPath }}
+        {{- end }}
         - name: traefik-config-vol
           mountPath: /etc/config
         {{- if .Values.acme.enabled }}
-        - mountPath: /acme
-          name: acme
+        - name: acme-vol
+          mountPath: /acme
         {{- end }}
         {{- if or (and .Values.acme.enabled (eq .Values.acme.challengeType "dns") .Values.acme.dnsProvider.name) .Values.env }}
         env:
@@ -128,8 +132,14 @@ spec:
           - "--providers.file.watch=true"
       {{- end }}
       volumes:
+      {{- if .Values.accessLogVolume.enabled }}
+      - name: access-log-vol
+        hostPath:
+          path: {{ .Values.accessLogVolume.hostPath }}
+          type: DirectoryOrCreate
+      {{- end }}
       {{- if .Values.acme.enabled }}
-      - name: acme
+      - name: acme-vol
       {{- if .Values.acme.persistence.enabled }}
         persistentVolumeClaim:
           claimName: {{ .Values.acme.persistence.existingClaim | default (printf "%s-acme" (include "traefik.fullname" .)) }}

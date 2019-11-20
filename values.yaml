@@ -149,3 +149,7 @@ acme:
       AWS_SECRET_ACCESS_KEY: ""
     vultr:
       VULTR_API_KEY: ""
+accessLogVolume:
+  enabled: false
+#  mountPath: /mountlogs
+#  hostPath: /logs
