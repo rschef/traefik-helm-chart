@@ -131,6 +131,14 @@ spec:
           - "--providers.file.directory=/etc/config"
           - "--providers.file.watch=true"
       {{- end }}
+      {{- if .Values.accessLog.enabled }}
+          - --accesslog=true
+          - --accessLog.filePath={{ .Values.accessLog.filePath }}
+          - --accessLog.bufferingSize={{ .Values.accessLog.bufferingSize }}
+          - --accessLog.filters.statuscodes={{ .Values.accessLog.statusCodes }}
+          - --accesslog.format={{ .Values.accessLog. }}
+          - --accesslog.fields.headers.defaultmode={{ .Values.accessLog. }}
+       {{- end }}
       volumes:
       {{- if .Values.accessLogVolume.enabled }}
       - name: access-log-vol

@@ -2,6 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ template "traefik.fullname" . }}
+  {{- if .Values.service.proxyProtocolEnabled }}
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
+  {{- end }}
   labels:
     app: {{ template "traefik.name" . }}
     chart: {{ template "traefik.chart" . }}

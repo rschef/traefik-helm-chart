@@ -14,7 +14,8 @@ ports:
   traefik:
     port: 8080
 #
-#service:
+service:
+  proxyProtocolEnabled: false
 #  externalTrafficPolicy: Cluster
 #
 logs:
@@ -149,7 +150,17 @@ acme:
       AWS_SECRET_ACCESS_KEY: ""
     vultr:
       VULTR_API_KEY: ""
-accessLogVolume:
-  enabled: false
-#  mountPath: /mountlogs
-#  hostPath: /logs
+#
+accessLog:
+  enabled: true
+  format: json
+  volume:
+    mountPath: /mountlogs
+    hostPath: /logs
+  filePath: /mountlogs/traefik.log
+  bufferingSize: 2
+  headers:
+    defaultmode: keep
+  statusCodes: "400-598"
+  retryAttempts: true
+  minDuration: "10ms"
