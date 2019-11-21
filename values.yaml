@@ -14,11 +14,9 @@ ports:
   traefik:
     port: 8080
 #
-#service:
+service:
+  proxyProtocolEnabled: false
 #  externalTrafficPolicy: Cluster
-#
-logs:
-  loglevel: INFO
 #
 yaml:
   resources:
@@ -42,13 +40,12 @@ api:
 #    certResolver: default
 #    host: host.dashboard.com
 #
-# file_provider_config_map: traefik-config
+staticConfig:
+dynamicConfig:
 #
 acme:
   enabled: false
-  email: admin@example.com
-  staging: true
-  challengeType: tls
+  challengeType: dns
   persistence:
     enabled: true
     annotations: {}
@@ -67,8 +64,6 @@ acme:
     ## If defined, PVC must be created manually before volume will be bound
     ##
     # existingClaim:
-  httpChallenge:
-    entrypoint: web
   dnsProvider:
     name: nil
     existingSecretName: ""
@@ -149,7 +144,9 @@ acme:
       AWS_SECRET_ACCESS_KEY: ""
     vultr:
       VULTR_API_KEY: ""
-accessLogVolume:
-  enabled: false
-#  mountPath: /mountlogs
-#  hostPath: /logs
+#
+accessLog:
+  enabled: true
+  volume:
+    mountPath: /mountlogs
+    hostPath: /logs

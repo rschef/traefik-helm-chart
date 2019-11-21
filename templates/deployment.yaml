@@ -73,12 +73,12 @@ spec:
           containerPort: {{ .Values.ports.traefik.port }}
           protocol: TCP
         volumeMounts:
-        {{- if .Values.accessLogVolume.enabled }}
+        - name: config
+          mountPath: /config
+        {{- if .Values.accessLog.enabled }}
         - name: access-log-vol
-          mountPath: {{ .Values.accessLogVolume.mountPath }}
+          mountPath: {{ .Values.accessLog.volume.mountPath }}
         {{- end }}
-        - name: traefik-config-vol
-          mountPath: /etc/config
         {{- if .Values.acme.enabled }}
         - name: acme-vol
           mountPath: /acme
@@ -100,42 +100,15 @@ spec:
         {{- end }}
         {{- end }}
         args:
-          - "--entryPoints.web.address=:{{ .Values.ports.web.port }}"
-          - "--entryPoints.websecure.address=:{{ .Values.ports.websecure.port }}"
-          - "--entryPoints.traefik.address=:{{ .Values.ports.traefik.port }}"
-          - "--ping=true"
-          - "--providers.kubernetescrd"
-          - "--log.level={{ .Values.logs.loglevel }}"
-          - "--api.dashboard={{ .Values.api.dashboard.enabled }}"
-          - "--api.insecure={{ .Values.api.insecure }}"
-        {{- if .Values.acme.enabled }}
-          - "--certificatesResolvers.default.acme.email={{ .Values.acme.email }}"
-          - "--certificatesResolvers.default.acme.storage=/acme/acme.json"
-        {{- if .Values.acme.staging }}
-          - "--certificatesResolvers.default.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory"
-        {{- end }}
-        {{- end }}
-        {{- if and .Values.acme.enabled (eq .Values.acme.challengeType "dns") }}
-          - "--certificatesResolvers.default.acme.dnschallenge=true"
-          - "--certificatesResolvers.default.acme.dnschallenge.provider={{ .Values.acme.dnsProvider.name }}"
-        {{- end }}
-        {{- if and .Values.acme.enabled (eq .Values.acme.challengeType "tls") }}
-          - "--certificatesResolvers.default.acme.tlschallenge=true"
-        {{- end }}
-        {{- if and .Values.acme.enabled (eq .Values.acme.challengeType "http") }}
-          - "--certificatesResolvers.default.acme.httpchallenge=true"
-          - "--certificatesResolvers.default.acme.httpchallenge.entrypoint={{ .Values.acme.httpChallenge.entrypoint }}"
-        {{- end }}
-      {{- if .Values.file_provider_config_map }}
-          - "--providers.file.filename=config.yml"
-          - "--providers.file.directory=/etc/config"
-          - "--providers.file.watch=true"
-      {{- end }}
+          - --configfile=/config/traefik-static.yaml
       volumes:
-      {{- if .Values.accessLogVolume.enabled }}
+      - name: config
+        configMap:
+          name: {{ template "traefik.fullname" . }}
+      {{- if .Values.accessLog.enabled }}
       - name: access-log-vol
         hostPath:
-          path: {{ .Values.accessLogVolume.hostPath }}
+          path: {{ .Values.accessLog.volume.hostPath }}
           type: DirectoryOrCreate
       {{- end }}
       {{- if .Values.acme.enabled }}
@@ -146,12 +119,4 @@ spec:
       {{- else }}
         emptyDir: {}
       {{- end }}
-      {{- end }}
-      {{- if .Values.file_provider_config_map }}
-      - name: traefik-config-vol
-        configMap:
-          name: {{ .Values.file_provider_config_map }}
-          items:
-            - key: config.yml
-              path: config.yml
       {{- end }}
