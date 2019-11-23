@@ -15,7 +15,7 @@ ports:
     port: 8080
 #
 service:
-  proxyProtocolEnabled: false
+  annotations:
 #  externalTrafficPolicy: Cluster
 #
 yaml:
